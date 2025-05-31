@@ -21,3 +21,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/gambar_dosen/
+    - assets/gambar_dosen/Ahirandra_Kasmi.jpg
+    - assets/json_data_chat_dosen/
+   

@@ -1,8 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:whazlansaja/data_saya.dart';
 
-class PesanScreen extends StatelessWidget {
-  const PesanScreen({super.key});
+class PesanScreen extends StatefulWidget {
+  final dynamic dosen;
+  const PesanScreen({super.key, required this.dosen});
+
+  @override
+  State<PesanScreen> createState() => _PesanScreenState();
+}
+
+class _PesanScreenState extends State<PesanScreen> {
+  late List<dynamic> messages;
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    messages = List<dynamic>.from(widget.dosen['messages']);
+  }
+
+  void _sendMessage() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+
+    setState(() {
+      messages.add({'from': 1, 'message': text});
+      _controller.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,19 +37,18 @@ class PesanScreen extends StatelessWidget {
       appBar: AppBar(
         leadingWidth: 29,
         elevation: 2,
-        title: const ListTile(
-          contentPadding: EdgeInsets.all(0),
+        title: ListTile(
+          contentPadding: const EdgeInsets.all(0),
           leading: CircleAvatar(
-            backgroundImage:
-                AssetImage('assets/gambar_dosen/Azlan, S.Kom., M.Kom.jpg'),
+            backgroundImage: AssetImage(widget.dosen['avatar']),
             radius: 16,
           ),
           title: Text(
-            'Azlan, S.Kom., M.Kom',
+            widget.dosen['full_name'],
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          subtitle: Text('06.30'),
+          subtitle: const Text('06.30'),
         ),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.video_call)),
@@ -38,9 +61,10 @@ class PesanScreen extends StatelessWidget {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: 5,
+              itemCount: messages.length,
               itemBuilder: (context, index) {
-                final isDosen = index % 2 == 0;
+                final message = messages[index];
+                final isDosen = message['from'] == 0;
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(
@@ -54,9 +78,8 @@ class PesanScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (isDosen)
-                        const CircleAvatar(
-                          backgroundImage: AssetImage(
-                              'assets/gambar_dosen/Azlan, S.Kom., M.Kom.jpg'),
+                        CircleAvatar(
+                          backgroundImage: AssetImage(widget.dosen['avatar']),
                           radius: 14,
                         ),
                       Flexible(
@@ -78,7 +101,7 @@ class PesanScreen extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            'index ke-$index ini adalah contoh chat. Silahkan ambil data chat dari file json.',
+                            message['message'],
                             style: TextStyle(
                               fontSize: 15,
                               color: isDosen
@@ -89,10 +112,9 @@ class PesanScreen extends StatelessWidget {
                         ),
                       ),
                       if (!isDosen)
-                        CircleAvatar(
+                        const CircleAvatar(
                           backgroundImage: AssetImage(
-                            DataSaya.gambar,
-                          ),
+                              'assets/gambar_dosen/Ahirandra_Kasmi.jpg'),
                           radius: 14,
                         ),
                     ],
@@ -104,18 +126,22 @@ class PesanScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(12),
             child: TextFormField(
+              controller: _controller,
               minLines: 1,
               maxLines: 3,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.emoji_emotions),
-                suffixIcon: Icon(Icons.send),
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.emoji_emotions),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: _sendMessage,
+                ),
                 hintText: 'Ketikkan pesan',
                 filled: true,
               ),
             ),
           ),
         ],
-      ),
+     ),
     );
   }
 }
